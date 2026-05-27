@@ -1,15 +1,4 @@
 import re
-import spacy
-import subprocess
-import sys
-
-# Auto-download model if missing
-try:
-    nlp = spacy.load("en_core_web_sm")
-except OSError:
-    subprocess.run([sys.executable, "-m", "spacy", "download", "en_core_web_sm"])
-    nlp = spacy.load("en_core_web_sm")
-
 
 def extract_tasks(text):
     tasks = []
@@ -22,12 +11,14 @@ def extract_tasks(text):
     priority_high = ["urgent", "asap", "immediately", "critical", "today"]
     priority_low  = ["eventually", "when possible", "low priority"]
 
+    # Simple name detection - capitalized word before action verb
+    name_pattern = re.compile(r'\b([A-Z][a-z]+)\b')
+
     for sentence in sentences:
         sentence = sentence.strip()
         if not sentence:
             continue
 
-        # Detect action verb
         task_text = None
         for verb in action_verbs:
             if verb in sentence.lower():
@@ -37,13 +28,11 @@ def extract_tasks(text):
         if not task_text:
             continue
 
-        # Extract person using spaCy
-        doc = nlp(sentence)
+        # Extract person - first capitalized word
         person = "Unassigned"
-        for ent in doc.ents:
-            if ent.label_ == "PERSON":
-                person = ent.text
-                break
+        names = name_pattern.findall(sentence)
+        if names:
+            person = names[0]
 
         # Extract deadline
         deadline_match = re.search(
