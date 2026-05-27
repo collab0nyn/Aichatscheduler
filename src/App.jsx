@@ -62,14 +62,10 @@ function DashboardPage() {
   const [tasks, setTasks] = useState([]);
   const [summary, setSummary] = useState('');
 
-  const handleExtract = (text) => {
-    const mockTasks = [
-      { person: 'Vaishnavi', task: 'Prepare the PPT', deadline: 'Friday', priority: 'Medium' },
-      { person: 'Rahul', task: 'Complete the backend', deadline: 'Today', priority: 'High' },
-      { person: 'Priya', task: 'Check the report', deadline: 'Before submission', priority: 'Medium' },
-    ];
-    setTasks(mockTasks);
-    setSummary('Discussed project deliverables including frontend UI, backend integration, and report review. Key tasks assigned with clear deadlines and priorities.');
+  // Receives real data from Flask via InputSection
+  const handleExtract = (data) => {
+    setTasks(data.tasks || []);
+    setSummary(data.summary || '');
   };
 
   return (
